@@ -1,23 +1,19 @@
 import express from 'express';
 import axios from 'axios';
+import parse from 'querystring'
 
 
 const app = express();
 const port = 8008;
 
 app.get('/numbers', async (req, res) => {
-  const query = req.query;
-  const urls = query.url;
+  const urls = req.query.url;
 
-  if (!urls || typeof urls === 'string') {
-    query.url = urls ? [urls] : [];
-  }
-
-  if (query.url.length === 0) {
+  if (!urls || !Array.isArray(urls)) {
     return res.status(400).json({ error: 'Invalid query parameters' });
   }
 
-  const validUrls = query.url.filter((url) => isValidUrl(url));
+  const validUrls = urls.filter((url) => isValidUrl(url));
 
   try {
     const responses = await Promise.all(validUrls.map((url) => fetchNumbersFromUrl(url)));
